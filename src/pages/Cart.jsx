@@ -2,37 +2,51 @@ import React, { useEffect, useState } from 'react';
 import { Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-import { emptycart,removefromcart } from '../slices/cartslice';
+import { emptycart, removefromcart } from '../slices/cartslice';
 
 function Cart() {
   const cartarray = useSelector((state) => state.cartreducer);
   const dispatch = useDispatch();
-  const [total,Settotal] = useState(0)
-  const navigate = useNavigate()
-  const gettotal = ()=>{
-    if(cartarray.length>0){
-      Settotal(cartarray?.map(item=>item?.price).reduce((p1,p2)=>p1+p2))
-    }
-    else{
-      Settotal(0)
-    }
+  const [total, Settotal] = useState(0);
+  const [searchQuery, setSearchQuery] = useState(''); // State for search query
+  const navigate = useNavigate();
 
-  }
+  const gettotal = () => {
+    if (cartarray.length > 0) {
+      Settotal(cartarray?.map(item => item?.price).reduce((p1, p2) => p1 + p2));
+    } else {
+      Settotal(0);
+    }
+  };
 
-  const checkout = ()=>{
-    dispatch(emptycart())
-    alert('thank You ......Order Placed Successfully')
-    navigate('/')
-  }
-  useEffect(()=>{
-    gettotal()
-  },[cartarray])
+  const checkout = () => {
+    dispatch(emptycart());
+    alert('Thank You ...... Order Placed Successfully');
+    navigate('/');
+  };
+
+  useEffect(() => {
+    gettotal();
+  }, [cartarray]);
+
+  // Filtered cart items based on search query
+  const filteredCartItems = cartarray.filter(item =>
+    item.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div style={{ marginTop: '150px' }}>
-      {cartarray?.length > 0 ? (
+      {cartarray.length > 0 ? (
         <div className='row w-100'>
           <div className='col-lg-6 m-5'>
+            {/* Search Bar */}
+            <input
+              type='text'
+              placeholder='Search products...'
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className='form-control mb-3'
+            />
             <table className='table border shadow'>
               <thead>
                 <tr>
@@ -44,11 +58,13 @@ function Cart() {
                 </tr>
               </thead>
               <tbody>
-                {cartarray.map((item, index) => (
+                {filteredCartItems.map((item, index) => (
                   <tr key={index}>
                     <td>{index + 1}</td>
                     <td>{item.title}</td>
-                    <td><img style={{ height: '100px', width: '100px' }} src={item.image} alt='no image' /></td>
+                    <td>
+                      <img style={{ height: '100px', width: '100px' }} src={item.image} alt='no image' />
+                    </td>
                     <td>{item.price}</td>
                     <td>
                       <Button onClick={() => dispatch(removefromcart(item.id))} variant='outline-danger btn rounded'>
@@ -62,10 +78,10 @@ function Cart() {
           </div>
           <div className='col-lg-4 d-flex justify-content-center align-items-center flex-column'>
             <div className='border shadow p-5'>
-              <h2 className='text-danger'> Cart Summary</h2>
-              <h4>Total number of products : {cartarray.length}</h4>
-              <h4>Total price is $ : {total}</h4>
-              <button onClick={checkout} className='btn btn-success rounded w-100 mt-3'> CheckOut</button>
+              <h2 className='text-danger'>Cart Summary</h2>
+              <h4>Total number of products: {filteredCartItems.length}</h4>
+              <h4>Total price is $: {total}</h4>
+              <button onClick={checkout} className='btn btn-success rounded w-100 mt-3'>CheckOut</button>
             </div>
           </div>
         </div>

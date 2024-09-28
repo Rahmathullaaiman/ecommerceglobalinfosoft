@@ -8,12 +8,9 @@ const cartslice = createSlice({
             state.push(action.payload)
         },
 
-        //function to remove cart
         removefromcart : (state,action)=>{
             return state.filter(item=>item.id!=action.payload)
-
         },
-        //fuction to empty cart
         emptycart :(state)=>{
             return state = []
         }
